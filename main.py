@@ -47,10 +47,10 @@ def tolerate_not_implemented(get_features: Callable[[], dict]) -> Callable[[], d
     """
     warned = False
 
-    def feature_source() -> dict:
+    def feature_source(chunk_size = 1024) -> dict:
         nonlocal warned
         try:
-            return get_features()
+            return get_features(chunk_size)
         except NotImplementedError:
             if not warned:
                 print(NOT_IMPLEMENTED_MESSAGE)
@@ -65,7 +65,13 @@ def run_full_app():
 
     pipeline = AudioPipeline(file_path=AUDIO_FILE)
     try:
-        pipeline.load()
+
+        signal = pipeline.load(path=AUDIO_FILE)
+        print("number of Sr", pipeline.sample_rate)
+        print("Number of samples: ", signal.shape)
+        print("Duration", signal.shape[0] / pipeline.sample_rate)
+        print("Signal", signal)
+
         feature_source = tolerate_not_implemented(pipeline.get_features)
     except NotImplementedError:
         print(NOT_IMPLEMENTED_MESSAGE)
