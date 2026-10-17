@@ -4,7 +4,7 @@ ENGINE and AUDIO_FILE are fixed, version-controlled choices, not runtime
 options — committing to one engine tier and one audio file is a project
 decision, not something to toggle per run.
 """
-
+import numpy as np
 from collections.abc import Callable
 
 from audio.pipeline import AudioPipeline
@@ -71,6 +71,14 @@ def run_full_app():
         print("Number of samples: ", signal.shape)
         print("Duration", signal.shape[0] / pipeline.sample_rate)
         print("Signal", signal)
+        middle = len(signal) // 2
+        start = middle - 1024 // 2
+        window = signal[start:start + 1024]
+        peak = float(np.max(np.abs(window)))
+        rms = float(np.sqrt(np.mean(window ** 2)))
+
+        print(f"Start sample: {start}")
+        print(f"Peak: {peak:.6f} | RMS: {rms:.6f}")
 
         feature_source = tolerate_not_implemented(pipeline.get_features)
     except NotImplementedError:
