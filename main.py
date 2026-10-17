@@ -72,7 +72,7 @@ def run_full_app():
         print("Duration", signal.shape[0] / pipeline.sample_rate)
         print("Signal", signal)
         middle = len(signal) // 2
-        start = middle - 1024 // 2
+        start = int(149 * pipeline.sample_rate)
         window = signal[start:start + 1024]
         peak = float(np.max(np.abs(window)))
         rms = float(np.sqrt(np.mean(window ** 2)))
