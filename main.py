@@ -67,19 +67,25 @@ def run_full_app():
     try:
 
         signal = pipeline.load(path=AUDIO_FILE)
-        print("number of Sr", pipeline.sample_rate)
-        print("Number of samples: ", signal.shape)
-        print("Duration", signal.shape[0] / pipeline.sample_rate)
-        print("Signal", signal)
-        middle = len(signal) // 2
-        start = int(149 * pipeline.sample_rate)
-        window = signal[start:start + 1024]
-        peak = float(np.max(np.abs(window)))
-        rms = float(np.sqrt(np.mean(window ** 2)))
+        #Prints info here.
+        print("number of Sr", pipeline.sample_rate) #Sample Rate (Set to 22050)
+        print("Number of samples: ", signal.shape) #How many samples are in it (Total).
+        print("Duration", signal.shape[0] / pipeline.sample_rate) #Duration of the audio. Total samples divided by SR
+        print("Signal", signal) #Prints audio array.
 
-        print(f"Start sample: {start}")
-        print(f"Peak: {peak:.6f} | RMS: {rms:.6f}")
+        start = int(149 * pipeline.sample_rate) #Selects window at 149 seconds.
+        window = signal[start:start + 1024] #Takes sample from previous starting position, and goes 1024 samples before stopping
+        peak = float(np.max(np.abs(window))) #Calculate Peak here
+        rms = float(np.sqrt(np.mean(window ** 2))) #RMS here
+        print(f"Start sample: {start}") #Prints Peak
+        print(f"Peak: {peak:.6f} | RMS: {rms:.6f}") #Prints RMS
 
+        pipeline.position = 0 #Resets position.
+        for i in range(20): #Loops 20 times.
+            features = pipeline.get_features()
+            print(f"Call {i + 1}: {features['amplitude']:.6f}")
+
+        pipeline.position = 0
         feature_source = tolerate_not_implemented(pipeline.get_features)
     except NotImplementedError:
         print(NOT_IMPLEMENTED_MESSAGE)
