@@ -80,10 +80,34 @@ def run_full_app():
         print(f"Start sample: {start}") #Prints Peak
         print(f"Peak: {peak:.6f} | RMS: {rms:.6f}") #Prints RMS
 
-        pipeline.position = 0 #Resets position.
-        for i in range(20): #Loops 20 times.
-            features = pipeline.get_features()
-            print(f"Call {i + 1}: {features['amplitude']:.6f}")
+        pipeline.position = 0
+        num_windows = len(signal) // pipeline.window_size #Divides total sample count by 1024 + rounds down
+        print(f"Complete Windows are {num_windows}")
+        min_amplitude = float("inf")
+        max_amplitude = float("-inf")
+        min_call = 0 #Base values
+        max_call = 0 #Base values
+        for i in range (num_windows):
+            features = pipeline.get_features() #Grabs features.
+            amplitude = features["amplitude"]
+            call_number = i + 1 #loops
+
+            if amplitude < min_amplitude: #replaces min amp with new amplitude if lower
+                min_amplitude = amplitude
+                min_call = call_number #stores call number
+
+            if amplitude > max_amplitude: #Replaces max amp with the new amplitude if its higher
+                max_amplitude = amplitude
+                max_call = call_number #Stores call number
+
+        print(f"Minimum is {min_amplitude:.6f} (call {min_call})") #prints min
+        print(f"Max is {max_amplitude:.6f} (call {max_call})") #Prints max
+
+        # 20 loop call from previous task
+        # pipeline.position = 0 #Resets position.
+        # for i in range(20): #Loops 20 times.
+        #     features = pipeline.get_features()
+        #     print(f"Call {i + 1}: {features['amplitude']:.6f}") 
 
         pipeline.position = 0
         feature_source = tolerate_not_implemented(pipeline.get_features)

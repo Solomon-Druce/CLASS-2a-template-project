@@ -33,13 +33,9 @@ class AudioPipeline:
         self.position += self.window_size
         return {"amplitude": amplitude}
         # amplitude = float(np.abs(chunk).mean()) #Mean
-
-
-        return {"Amplitude": rms_value}
         """Extract numerical features (amplitude at minimum) from the current
         window of the loaded signal, advance the pipeline's internal read
         position accordingly, and return them as a dict[str, float].
 
         This return value is passed directly into engine.update().
         """
-        raise NotImplementedError
