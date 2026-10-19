@@ -67,18 +67,18 @@ def run_full_app():
     try:
 
         signal = pipeline.load(path=AUDIO_FILE)
-        #Prints info here.
+        #Prints info here. Test 1
         print("number of Sr", pipeline.sample_rate) #Sample Rate (Set to 22050)
         print("Number of samples: ", signal.shape) #How many samples are in it (Total).
         print("Duration", signal.shape[0] / pipeline.sample_rate) #Duration of the audio. Total samples divided by SR
         print("Signal", signal) #Prints audio array.
-
-        start = int(149 * pipeline.sample_rate) #Selects window at 149 seconds.
+        #Test 2
+        start = int(149 * pipeline.sample_rate) #Selects window at 149 seconds and calcs.
         window = signal[start:start + 1024] #Takes sample from previous starting position, and goes 1024 samples before stopping
         peak = float(np.max(np.abs(window))) #Calculate Peak here
         rms = float(np.sqrt(np.mean(window ** 2))) #RMS here
-        print(f"Start sample: {start}") #Prints Peak
-        print(f"Peak: {peak:.6f} | RMS: {rms:.6f}") #Prints RMS
+        print(f"Start sample: {start}") #Prints start sample
+        print(f"Peak: {peak:.6f} | RMS: {rms:.6f}") #Prints RMS and peak (both 6 figure)
 
         pipeline.position = 0
         num_windows = len(signal) // pipeline.window_size #Divides total sample count by 1024 + rounds down
@@ -89,7 +89,7 @@ def run_full_app():
         max_call = 0 #Base values
         for i in range (num_windows):
             features = pipeline.get_features() #Grabs features.
-            amplitude = features["amplitude"]
+            amplitude = features["amplitude"] #Gets amplitude from get-features
             call_number = i + 1 #loops
 
             if amplitude < min_amplitude: #replaces min amp with new amplitude if lower
@@ -109,18 +109,18 @@ def run_full_app():
         jump_frame = 0
 
         for i in range(200): #NOTE TO SELF: CHANGE CHUNK_SIZE VALUE FOR TESTS.
-            features = pipeline.get_features()
-            amplitude = features['amplitude']
-            print(f"frame{i + 1}: {amplitude:.6f}")
+            features = pipeline.get_features() #Grabs get_features from pipeline.py
+            amplitude = features['amplitude'] #Gets amplitude from get-features
+            print(f"frame{i + 1}: {amplitude:.6f}")#Prints the frame (+1) with the amplitude to 6 dec figures
 
-            if previous_amplitude is not None:
-                jump = abs(amplitude - previous_amplitude)
-                if jump > largest_jump:
+            if previous_amplitude is not None: #Checks if amplitude exists to compare to.
+                jump = abs(amplitude - previous_amplitude)# subtracts previous frame using current frame amplitue. Takes absolute (abs) value
+                if jump > largest_jump: #checks current vs largest jump. If true, runs
                     largest_jump = jump
-                    jump_frame = i + 1
+                    jump_frame = i + 1 #Records frame it happened
 
             previous_amplitude = amplitude
-        print(f"Biggest jump: {largest_jump:.6f} at {jump_frame}")
+        print(f"Biggest jump: {largest_jump:.6f} at {jump_frame}") #Shows biggest jump (to 6 figs) along with specific frame jump
 
 
         # 20 loop call from previous task
