@@ -28,10 +28,22 @@ class AudioPipeline:
         #raise NotImplementedError
 
     def get_features(self, chunk_size: int = 1024) -> dict:
-        chunk = self.signal[self.position:self.position + self.window_size]
-        amplitude = float(np.sqrt(np.mean(chunk ** 2))) #Amplitude version
-        self.position += self.window_size
+        if self.position + chunk_size > len(self.signal):
+            self.position = 0
+
+        chunk = self.signal[self.position:self.position + chunk_size]
+        amplitude = float(np.sqrt(np.mean(chunk ** 2)))
+        self.position += chunk_size
+        #print(self.position, len(self.signal)) #Temp for task
         return {"amplitude": amplitude}
+
+
+        #chunk = self.signal[self.position:self.position + self.window_size]
+        #amplitude = float(np.sqrt(np.mean(chunk ** 2))) #Amplitude version
+
+        #print(self.position, len(self.signal)) #Temp for task
+
+        #self.position += self.window_size
         # amplitude = float(np.abs(chunk).mean()) #Mean
         """Extract numerical features (amplitude at minimum) from the current
         window of the loaded signal, advance the pipeline's internal read

@@ -103,6 +103,26 @@ def run_full_app():
         print(f"Minimum is {min_amplitude:.6f} (call {min_call})") #prints min
         print(f"Max is {max_amplitude:.6f} (call {max_call})") #Prints max
 
+        pipeline.position = 0
+        previous_amplitude = None
+        largest_jump = 0
+        jump_frame = 0
+
+        for i in range(200): #NOTE TO SELF: CHANGE CHUNK_SIZE VALUE FOR TESTS.
+            features = pipeline.get_features()
+            amplitude = features['amplitude']
+            print(f"frame{i + 1}: {amplitude:.6f}")
+
+            if previous_amplitude is not None:
+                jump = abs(amplitude - previous_amplitude)
+                if jump > largest_jump:
+                    largest_jump = jump
+                    jump_frame = i + 1
+
+            previous_amplitude = amplitude
+        print(f"Biggest jump: {largest_jump:.6f} at {jump_frame}")
+
+
         # 20 loop call from previous task
         # pipeline.position = 0 #Resets position.
         # for i in range(20): #Loops 20 times.
