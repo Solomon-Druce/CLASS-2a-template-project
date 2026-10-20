@@ -18,8 +18,8 @@ from engines.pyglet_engine import PygletEngine
 ENGINE: type[BaseEngine] = PygletEngine
 
 AUDIO_FILE = "audio/CGA.mp3"
-WINDOW_WIDTH = 1280
-WINDOW_HEIGHT = 720
+WINDOW_WIDTH = 1920
+WINDOW_HEIGHT = 1080
 WINDOW_TITLE = "CLASS-2a Project"
 TARGET_FPS = 60
 
