@@ -21,6 +21,14 @@ class PygletEngine(BaseEngine):
         #Border(?)
         self.batch = pyglet.graphics.Batch()
         self.border_line = shapes.Line (x = 0, x2 = 1920, y= 325, y2=325, thickness = 10, color = (50, 225, 30), batch = self.batch)
+        #Bars (WIP) Intent is to have user select how many bars they want (How?)
+        self.bars = []
+        x = 200
+        for i in range(5):
+            bar = shapes.Rectangle (x, y = 400, width = 100, height = 200, color = (0, 255, 0), batch = self.batch)
+            self.bars.append(bar)
+            x = x + 120
+
 
         @self.window.event
         def on_close():
