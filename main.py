@@ -65,7 +65,7 @@ def run_full_app():
 
     pipeline = AudioPipeline(file_path=AUDIO_FILE)
     try:
-
+  # Test that get_features() is implemented, not just load()
         signal = pipeline.load(path=AUDIO_FILE)
         #Prints info here. Test 1
         print("number of Sr", pipeline.sample_rate) #Sample Rate (Set to 22050)
@@ -73,7 +73,7 @@ def run_full_app():
         print("Duration", signal.shape[0] / pipeline.sample_rate) #Duration of the audio. Total samples divided by SR
         print("Signal", signal) #Prints audio array.
         #Test 2
-        start = int(149 * pipeline.sample_rate) #Selects window at 149 seconds and calcs.
+        start = int(30 * pipeline.sample_rate) #Selects window at 149 seconds and calcs.
         window = signal[start:start + 1024] #Takes sample from previous starting position, and goes 1024 samples before stopping
         peak = float(np.max(np.abs(window))) #Calculate Peak here
         rms = float(np.sqrt(np.mean(window ** 2))) #RMS here
@@ -108,7 +108,7 @@ def run_full_app():
         largest_jump = 0
         jump_frame = 0
 
-        for i in range(200): #NOTE TO SELF: CHANGE CHUNK_SIZE VALUE FOR TESTS.
+        for i in range(2): #NOTE TO SELF: CHANGE CHUNK_SIZE VALUE FOR TESTS.
             features = pipeline.get_features() #Grabs get_features from pipeline.py
             amplitude = features['amplitude'] #Gets amplitude from get-features
             print(f"frame{i + 1}: {amplitude:.6f}")#Prints the frame (+1) with the amplitude to 6 dec figures
@@ -122,7 +122,18 @@ def run_full_app():
             previous_amplitude = amplitude
         print(f"Biggest jump: {largest_jump:.6f} at {jump_frame}") #Shows biggest jump (to 6 figs) along with specific frame jump
 
+        hanning = np.fft.rfft(1024 * np.hanning(1024))
+        # print(hanning)
+        # # np.argmax(hanning)
+        # print(f"Max is {np.argmax(hanning):.6f}")
 
+        highest_hanning = 0
+        for i in range(len(hanning)):
+            print(f"Frame {i + 1}: {hanning[i]:.6f}")
+            if hanning[i] > highest_hanning:
+                highest_hanning = hanning[i]
+
+        print(f"Highest hanning is {highest_hanning:.6f}")
         # 20 loop call from previous task
         # pipeline.position = 0 #Resets position.
         # for i in range(20): #Loops 20 times.

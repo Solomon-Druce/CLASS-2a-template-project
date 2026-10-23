@@ -28,14 +28,20 @@ class AudioPipeline:
         #raise NotImplementedError
 
     def get_features(self, chunk_size: int = 1024) -> dict: #Chunk+size = samples to be read.
+        #Amplitude
         if self.position + chunk_size > len(self.signal): #Where the next section starts. Len(self.,sginal) is total samples
             self.position = 0
         chunk = self.signal[self.position:self.position + chunk_size] #Takes the audio window in a slice. Ends before chunk_size added to selfposition
         amplitude = float(np.sqrt(np.mean(chunk ** 2))) #Calcs Root mean square (rms)
         self.position += chunk_size #Advances to the next set.
+        #Hanning
+        window = np.hanning(1024)
+        bin = np.fft.rfft(chunk_size * window)
+        np.fft.rfft(chunk_size * np.hanning(1024))
         #print(self.position, len(self.signal)) #Temp for task
-        return {"amplitude": amplitude}
-
+        return {"amplitude": amplitude,
+                "Bins": bin
+                }
 
         #chunk = self.signal[self.position:self.position + self.window_size]
         #amplitude = float(np.sqrt(np.mean(chunk ** 2))) #Amplitude version
