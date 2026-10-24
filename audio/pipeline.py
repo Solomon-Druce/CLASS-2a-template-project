@@ -34,13 +34,24 @@ class AudioPipeline:
         chunk = self.signal[self.position:self.position + chunk_size] #Takes the audio window in a slice. Ends before chunk_size added to selfposition
         amplitude = float(np.sqrt(np.mean(chunk ** 2))) #Calcs Root mean square (rms)
         self.position += chunk_size #Advances to the next set.
-        #Hanning
-        window = np.hanning(1024)
-        bin = np.fft.rfft(chunk_size * window)
-        np.fft.rfft(chunk_size * np.hanning(1024))
+        #Workshop 3, task1+2
+        window = np.hanning(chunk_size)
+        spectrum = np.fft.rfft(chunk * window)
+        magnitude = np.abs(spectrum)
+        bass_edge = int(250 * chunk_size / self.sample_rate)
+        treble_edge = int(2000 * chunk_size / self.sample_rate)
+        bass_energy = np.sum(magnitude[:bass_edge] ** 2)
+        mid_energy = np.sum(magnitude[bass_edge:treble_edge] ** 2)
+        treble_energy = np.sum(magnitude[treble_edge:] ** 2)
+        frequencies = np.fft.rfftfreq(chunk_size, d=1 / self.sample_rate)
+        centroid = np.sum(frequencies * magnitude) / np.sum(magnitude)
+
         #print(self.position, len(self.signal)) #Temp for task
         return {"amplitude": amplitude,
-                "Bins": bin
+                "Bass": float(bass_energy),
+                "mid energy": float(mid_energy),
+                "treble energy": float(treble_energy),
+                "centroid": float(centroid)
                 }
 
         #chunk = self.signal[self.position:self.position + self.window_size]

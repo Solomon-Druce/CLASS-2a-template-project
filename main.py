@@ -121,7 +121,8 @@ def run_full_app():
 
             previous_amplitude = amplitude
         print(f"Biggest jump: {largest_jump:.6f} at {jump_frame}") #Shows biggest jump (to 6 figs) along with specific frame jump
-
+        
+        #workshop 3, part 1
         start = int(30 * pipeline.sample_rate)
         window = signal[start:start + 1024]
         result = np.fft.rfft(window * np.hanning(1024))
@@ -139,6 +140,13 @@ def run_full_app():
         print(f"strongest bin {strongest_bin}")
         print(f"strongest_frequency {frequency:.6f}hz")
         print(f"strongest magnitude {strongest_mag:.6f}")
+        
+        pipeline.position = 0
+        for i in range(50):
+            features = pipeline.get_features()
+
+            if (i + 1) % 10 == 0:
+                print(i + 1, features)
         # 20 loop call from previous task
         # pipeline.position = 0 #Resets position.
         # for i in range(20): #Loops 20 times.
