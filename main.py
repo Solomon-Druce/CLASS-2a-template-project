@@ -122,18 +122,23 @@ def run_full_app():
             previous_amplitude = amplitude
         print(f"Biggest jump: {largest_jump:.6f} at {jump_frame}") #Shows biggest jump (to 6 figs) along with specific frame jump
 
-        hanning = np.fft.rfft(1024 * np.hanning(1024))
-        # print(hanning)
-        # # np.argmax(hanning)
-        # print(f"Max is {np.argmax(hanning):.6f}")
+        start = int(30 * pipeline.sample_rate)
+        window = signal[start:start + 1024]
+        result = np.fft.rfft(window * np.hanning(1024))
+        magnitude = np.abs(result)
+        bin_1_frequency = 1* pipeline.sample_rate / 1024 # 1st bin freqncy
+        last_bin = len(magnitude) - 1
+        last_bin = last_bin * pipeline.sample_rate / 1024 #last bin frequency
+        strongest_bin = np.argmax(magnitude[1:513]) + 1
+        strongest_mag = magnitude[strongest_bin]
+        frequency = strongest_bin * pipeline.sample_rate / 1024
 
-        highest_hanning = 0
-        for i in range(len(hanning)):
-            print(f"Frame {i + 1}: {hanning[i]:.6f}")
-            if hanning[i] > highest_hanning:
-                highest_hanning = hanning[i]
-
-        print(f"Highest hanning is {highest_hanning:.6f}")
+        print(f"Bin count: {len(magnitude)}")#513
+        print(f"1st bin Frequncy is {bin_1_frequency}hz")#21.5332 hz
+        print(f"last bin frequency is {last_bin:.6f}hz") ##11025hz
+        print(f"strongest bin {strongest_bin}")
+        print(f"strongest_frequency {frequency:.6f}hz")
+        print(f"strongest magnitude {strongest_mag:.6f}")
         # 20 loop call from previous task
         # pipeline.position = 0 #Resets position.
         # for i in range(20): #Loops 20 times.
