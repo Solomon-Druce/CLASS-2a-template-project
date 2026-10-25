@@ -16,6 +16,7 @@ class AudioPipeline:
         self.sample_rate = sample_rate
         self.position = 0
         self.window_size = 1024
+        self.previous_magnitude = np.zeros(self.window_size // 2 + 1) #Array of 513 zeros
 
     def load(self, path: str, sr: int = 22050) -> None:
         signal, _ = librosa.load(path, sr=sr)
@@ -45,13 +46,18 @@ class AudioPipeline:
         treble_energy = np.sum(magnitude[treble_edge:] ** 2)
         frequencies = np.fft.rfftfreq(chunk_size, d=1 / self.sample_rate)
         centroid = np.sum(frequencies * magnitude) / np.sum(magnitude)
+        #Task 3, part 3
+        self.previous_magnitude = np.zeros(self.window_size // 2 + 1)
+        onset = np.sum(np.maximum(0, magnitude - self.previous_magnitude))
+        self.previous_magnitude = magnitude.copy()
 
         #print(self.position, len(self.signal)) #Temp for task
         return {"amplitude": amplitude,
                 "Bass": float(bass_energy),
                 "mid energy": float(mid_energy),
                 "treble energy": float(treble_energy),
-                "centroid": float(centroid)
+                "centroid": float(centroid),
+                "onset": float(onset)
                 }
 
         #chunk = self.signal[self.position:self.position + self.window_size]

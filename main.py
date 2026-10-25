@@ -6,6 +6,7 @@ decision, not something to toggle per run.
 """
 import numpy as np
 from collections.abc import Callable
+import librosa
 
 from audio.pipeline import AudioPipeline
 from engines.base_engine import BaseEngine
@@ -68,65 +69,65 @@ def run_full_app():
   # Test that get_features() is implemented, not just load()
         signal = pipeline.load(path=AUDIO_FILE)
         #Prints info here. Test 1
-        print("number of Sr", pipeline.sample_rate) #Sample Rate (Set to 22050)
-        print("Number of samples: ", signal.shape) #How many samples are in it (Total).
-        print("Duration", signal.shape[0] / pipeline.sample_rate) #Duration of the audio. Total samples divided by SR
-        print("Signal", signal) #Prints audio array.
+        # print("number of Sr", pipeline.sample_rate) #Sample Rate (Set to 22050)
+        # print("Number of samples: ", signal.shape) #How many samples are in it (Total).
+        # print("Duration", signal.shape[0] / pipeline.sample_rate) #Duration of the audio. Total samples divided by SR
+        # print("Signal", signal) #Prints audio array.
         #Test 2
-        start = int(30 * pipeline.sample_rate) #Selects window at 149 seconds and calcs.
-        window = signal[start:start + 1024] #Takes sample from previous starting position, and goes 1024 samples before stopping
-        peak = float(np.max(np.abs(window))) #Calculate Peak here
-        rms = float(np.sqrt(np.mean(window ** 2))) #RMS here
-        print(f"Start sample: {start}") #Prints start sample
-        print(f"Peak: {peak:.6f} | RMS: {rms:.6f}") #Prints RMS and peak (both 6 figure)
+        # start = int(30 * pipeline.sample_rate) #Selects window at 149 seconds and calcs.
+        # window = signal[start:start + 1024] #Takes sample from previous starting position, and goes 1024 samples before stopping
+        # peak = float(np.max(np.abs(window))) #Calculate Peak here
+        # rms = float(np.sqrt(np.mean(window ** 2))) #RMS here
+        # print(f"Start sample: {start}") #Prints start sample
+        # print(f"Peak: {peak:.6f} | RMS: {rms:.6f}") #Prints RMS and peak (both 6 figure)
 
-        pipeline.position = 0
-        num_windows = len(signal) // pipeline.window_size #Divides total sample count by 1024 + rounds down
-        print(f"Complete Windows are {num_windows}")
-        min_amplitude = float("inf")
-        max_amplitude = float("-inf")
-        min_call = 0 #Base values
-        max_call = 0 #Base values
-        for i in range (num_windows):
-            features = pipeline.get_features() #Grabs features.
-            amplitude = features["amplitude"] #Gets amplitude from get-features
-            call_number = i + 1 #loops
+        # pipeline.position = 0
+        # num_windows = len(signal) // pipeline.window_size #Divides total sample count by 1024 + rounds down
+        # print(f"Complete Windows are {num_windows}")
+        # min_amplitude = float("inf")
+        # max_amplitude = float("-inf")
+        # min_call = 0 #Base values
+        # max_call = 0 #Base values
+        # for i in range (num_windows):
+        #     features = pipeline.get_features() #Grabs features.
+        #     amplitude = features["amplitude"] #Gets amplitude from get-features
+        #     call_number = i + 1 #loops
 
-            if amplitude < min_amplitude: #replaces min amp with new amplitude if lower
-                min_amplitude = amplitude
-                min_call = call_number #stores call number
+        #     if amplitude < min_amplitude: #replaces min amp with new amplitude if lower
+        #         min_amplitude = amplitude
+        #         min_call = call_number #stores call number
 
-            if amplitude > max_amplitude: #Replaces max amp with the new amplitude if its higher
-                max_amplitude = amplitude
-                max_call = call_number #Stores call number
+        #     if amplitude > max_amplitude: #Replaces max amp with the new amplitude if its higher
+        #         max_amplitude = amplitude
+        #         max_call = call_number #Stores call number
 
-        print(f"Minimum is {min_amplitude:.6f} (call {min_call})") #prints min
-        print(f"Max is {max_amplitude:.6f} (call {max_call})") #Prints max
+        # print(f"Minimum is {min_amplitude:.6f} (call {min_call})") #prints min
+        # print(f"Max is {max_amplitude:.6f} (call {max_call})") #Prints max
 
-        pipeline.position = 0
-        previous_amplitude = None
-        largest_jump = 0
-        jump_frame = 0
+        # pipeline.position = 0
+        # previous_amplitude = None
+        # largest_jump = 0
+        # jump_frame = 0
 
-        for i in range(2): #NOTE TO SELF: CHANGE CHUNK_SIZE VALUE FOR TESTS.
-            features = pipeline.get_features() #Grabs get_features from pipeline.py
-            amplitude = features['amplitude'] #Gets amplitude from get-features
-            print(f"frame{i + 1}: {amplitude:.6f}")#Prints the frame (+1) with the amplitude to 6 dec figures
+        # for i in range(2): #NOTE TO SELF: CHANGE CHUNK_SIZE VALUE FOR TESTS.
+        #     features = pipeline.get_features() #Grabs get_features from pipeline.py
+        #     amplitude = features['amplitude'] #Gets amplitude from get-features
+        #     print(f"frame{i + 1}: {amplitude:.6f}")#Prints the frame (+1) with the amplitude to 6 dec figures
 
-            if previous_amplitude is not None: #Checks if amplitude exists to compare to.
-                jump = abs(amplitude - previous_amplitude)# subtracts previous frame using current frame amplitue. Takes absolute (abs) value
-                if jump > largest_jump: #checks current vs largest jump. If true, runs
-                    largest_jump = jump
-                    jump_frame = i + 1 #Records frame it happened
+        #     if previous_amplitude is not None: #Checks if amplitude exists to compare to.
+        #         jump = abs(amplitude - previous_amplitude)# subtracts previous frame using current frame amplitue. Takes absolute (abs) value
+        #         if jump > largest_jump: #checks current vs largest jump. If true, runs
+        #             largest_jump = jump
+        #             jump_frame = i + 1 #Records frame it happened
 
-            previous_amplitude = amplitude
-        print(f"Biggest jump: {largest_jump:.6f} at {jump_frame}") #Shows biggest jump (to 6 figs) along with specific frame jump
+        #     previous_amplitude = amplitude
+        # print(f"Biggest jump: {largest_jump:.6f} at {jump_frame}") #Shows biggest jump (to 6 figs) along with specific frame jump
         
-        #workshop 3, part 1
+        #workshop 3, part 1 +2
         start = int(30 * pipeline.sample_rate)
         window = signal[start:start + 1024]
         result = np.fft.rfft(window * np.hanning(1024))
-        magnitude = np.abs(result)
+        magnitude = np.abs(result) #Takes portions starting at 30 secs, uses fft to discover strongest frequency
         bin_1_frequency = 1* pipeline.sample_rate / 1024 # 1st bin freqncy
         last_bin = len(magnitude) - 1
         last_bin = last_bin * pipeline.sample_rate / 1024 #last bin frequency
@@ -140,13 +141,61 @@ def run_full_app():
         print(f"strongest bin {strongest_bin}")
         print(f"strongest_frequency {frequency:.6f}hz")
         print(f"strongest magnitude {strongest_mag:.6f}")
-        
+
         pipeline.position = 0
         for i in range(50):
             features = pipeline.get_features()
 
             if (i + 1) % 10 == 0:
                 print(i + 1, features)
+
+        #workshop 3, prt3
+        pipeline.position = 0
+        pipeline.previous_magnitude = np.zeros(pipeline.window_size // 2 + 1)
+        onsets = []
+        num_windows = len(signal) // pipeline.window_size
+
+        for i in range(num_windows):
+            position = pipeline.position
+            features = pipeline.get_features()
+            time = position / pipeline.sample_rate
+            onsets.append((features["onset"], time))
+
+        onsets.sort(reverse=True)
+        selected = []
+
+        for strong, time in onsets:
+            if all(abs(time - existing_time) >= 0.5
+                   for _, existing_time in selected):
+                selected.append((strong, time))
+
+            if len(selected) == 5:
+                break
+
+        for strength, time in selected:
+            print(f"Onset is {strength:.6f}, Time is {time:.6f} (seconds)")
+
+        detected_onsets = librosa.onset.onset_detect(y=signal, sr=pipeline.sample_rate, units="time")
+        print("librosa onset time is", detected_onsets)
+
+        #task 15 (workshop 3, part 3)
+        pipeline.position = 0
+        chunk = signal[:pipeline.window_size]
+        window = np.hanning(pipeline.window_size)
+        widnowed_chunk = chunk * window
+        samp_energy = np.sum(widnowed_chunk ** 2)
+        magnitude = np.abs(np.fft.rfft(chunk*window))
+        bass_edge = int(250 * pipeline.window_size / pipeline.sample_rate)
+        treble_edge = int(2000 * pipeline.window_size / pipeline.sample_rate)
+        bass_energy = np.sum(magnitude[:bass_edge] ** 2)
+        mid_energy = np.sum(magnitude[bass_edge:treble_edge] ** 2)
+        treble_energy = np.sum(magnitude[treble_edge:] ** 2)
+        total_energy = bass_energy + mid_energy + treble_energy
+
+        print(f"sample energy is {samp_energy:.12e}")
+        print(f"sample energy is {total_energy:.12e}")
+        print(f"difference is {abs(samp_energy - total_energy):.12e}")
+
         # 20 loop call from previous task
         # pipeline.position = 0 #Resets position.
         # for i in range(20): #Loops 20 times.
