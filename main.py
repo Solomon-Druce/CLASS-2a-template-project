@@ -129,7 +129,7 @@ def run_full_app():
         result = np.fft.rfft(window * np.hanning(1024))
         magnitude = np.abs(result) #Takes portions starting at 30 secs, uses fft to discover strongest frequency
         bin_1_frequency = 1* pipeline.sample_rate / 1024 # 1st bin freqncy
-        last_bin = len(magnitude) - 1
+        last_bin = len(magnitude) - 1 
         last_bin = last_bin * pipeline.sample_rate / 1024 #last bin frequency
         strongest_bin = np.argmax(magnitude[1:513]) + 1
         strongest_mag = magnitude[strongest_bin]
@@ -162,8 +162,8 @@ def run_full_app():
             onsets.append((features["onset"], time))
 
         onsets.sort(reverse=True)
-        selected = []
 
+        selected = []
         for strong, time in onsets:
             if all(abs(time - existing_time) >= 0.5
                    for _, existing_time in selected):
@@ -179,28 +179,27 @@ def run_full_app():
         print("librosa onset time is", detected_onsets)
 
         #task 15 (workshop 3, part 3)
+
         pipeline.position = 0
-        chunk = signal[:pipeline.window_size]
-        window = np.hanning(pipeline.window_size)
-        widnowed_chunk = chunk * window
-        samp_energy = np.sum(widnowed_chunk ** 2)
-        magnitude = np.abs(np.fft.rfft(chunk*window))
+        chunk = signal[:pipeline.window_size] # Takes 1024 samples from audio beginning. Saves as "Chunk"
+        window = np.hanning(pipeline.window_size) #Hanning is 1024, not hardcoded this time.
+        windowed_chunk = chunk * window #Chunk x Window grants windowed chunk
+        sample_energy = np.sum(windowed_chunk ** 2) #Gets sample energy
+        magnitude = abs(np.fft.rfft(chunk * window))
         bass_edge = int(250 * pipeline.window_size / pipeline.sample_rate)
         treble_edge = int(2000 * pipeline.window_size / pipeline.sample_rate)
-        bass_energy = np.sum(magnitude[:bass_edge] ** 2)
+
+        #Total energy | Should be adding up bass/treble/middle group?
+        # presumably its something along the lines of [:bassedge] for lower, [bassedge:treble] for mid and [trebleedge:] for high? with magnitude([]) ** 2 for each one?
+        # Total is low + mid + high = high?
+        low_energy = np.sum(magnitude[:bass_edge] ** 2)
         mid_energy = np.sum(magnitude[bass_edge:treble_edge] ** 2)
-        treble_energy = np.sum(magnitude[treble_edge:] ** 2)
-        total_energy = bass_energy + mid_energy + treble_energy
+        high_energy = np.sum(magnitude[treble_edge:] ** 2)
+        total_energy = low_energy + mid_energy + high_energy
 
-        print(f"sample energy is {samp_energy:.12e}")
-        print(f"sample energy is {total_energy:.12e}")
-        print(f"difference is {abs(samp_energy - total_energy):.12e}")
-
-        # 20 loop call from previous task
-        # pipeline.position = 0 #Resets position.
-        # for i in range(20): #Loops 20 times.
-        #     features = pipeline.get_features()
-        #     print(f"Call {i + 1}: {features['amplitude']:.6f}") 
+        print(f"Total energy is {total_energy:.12e}")
+    
+        #Print the difference
 
         pipeline.position = 0
         feature_source = tolerate_not_implemented(pipeline.get_features)
