@@ -28,6 +28,12 @@ class PygletEngine(BaseEngine):
             bar = shapes.Rectangle (x, y = 400, width = 100, height = 200, color = (0, 255, 0), batch = self.batch)
             self.bars.append(bar)
             x = x + 120
+        #Audio playing (forgot earlier)
+        self.audio_source = pyglet.media.load("audio/CGA.mp3", streaming = False)
+        self.audio_player = pyglet.media.Player()
+        self.audio_player.volume = 0.1 #Volume control.
+        self.audio_player.queue(self.audio_source)
+        self.audio_player.play()
 
 
         @self.window.event
@@ -57,4 +63,6 @@ class PygletEngine(BaseEngine):
         self.window.flip()
 
     def teardown(self) -> None:
+        self.audio_player.pause()
+        self.audio_player.delete()
         self.window.close()
