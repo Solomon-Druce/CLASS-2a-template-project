@@ -29,6 +29,11 @@ class AudioPipeline:
         #raise NotImplementedError
 
     def get_features(self, chunk_size: int = 1024) -> dict: #Chunk+size = samples to be read.
+        #Ideas:
+        #Add playback_time: float to get_features to keep track of that?
+        #make self position based on playback time multiplied by sample_rate?
+        #Keep the loop directly below "amplitude" (Make it look nicer tho)
+        
         #Amplitude
         if self.position + chunk_size > len(self.signal): #Where the next section starts. Len(self.,sginal) is total samples
             self.position = 0

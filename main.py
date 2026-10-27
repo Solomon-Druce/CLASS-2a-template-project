@@ -201,6 +201,9 @@ def run_full_app():
     
         #Print the difference
 
+        #Change this to a function?
+        #Feature_source()? then get it to return audio_player.time?
+        #Keep the except for now(?)
         pipeline.position = 0
         feature_source = tolerate_not_implemented(pipeline.get_features)
     except NotImplementedError:

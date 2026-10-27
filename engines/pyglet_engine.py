@@ -53,6 +53,10 @@ class PygletEngine(BaseEngine):
         self.window.dispatch_events()
         return not self._should_close
 
+    #New function for audio features?
+    #Playback time equal to audio_player time
+    #gets info from get_features(playback time) to keep them in sync?
+
     def update(self, audio_features: dict) -> None:
         self.amplitude_label.text = f"Amplitude is  {audio_features["amplitude"]:.6f}"#Takes info from audio_features(specifically amplitude to 6 figures) and displays it.
 
