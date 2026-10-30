@@ -198,7 +198,6 @@ def run_full_app():
         total_energy = low_energy + mid_energy + high_energy
 
         print(f"Total energy is {total_energy:.12e}")
-    
         #Print the difference
 
         #Change this to a function?
