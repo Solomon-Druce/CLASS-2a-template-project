@@ -48,10 +48,10 @@ def tolerate_not_implemented(get_features: Callable[[], dict]) -> Callable[[], d
     """
     warned = False
 
-    def feature_source(chunk_size = 1024) -> dict:
+    def feature_source() -> dict: #chunk_size = 1024 inside feature_source.
         nonlocal warned
         try:
-            return get_features(chunk_size)
+            return get_features() #chunk_size inside.
         except NotImplementedError:
             if not warned:
                 print(NOT_IMPLEMENTED_MESSAGE)
@@ -124,59 +124,59 @@ def run_full_app():
         # print(f"Biggest jump: {largest_jump:.6f} at {jump_frame}") #Shows biggest jump (to 6 figs) along with specific frame jump
         
         #workshop 3, part 1 +2
-        start = int(30 * pipeline.sample_rate)
-        window = signal[start:start + 1024]
-        result = np.fft.rfft(window * np.hanning(1024))
-        magnitude = np.abs(result) #Takes portions starting at 30 secs, uses fft to discover strongest frequency
-        bin_1_frequency = 1* pipeline.sample_rate / 1024 # 1st bin freqncy
-        last_bin = len(magnitude) - 1 
-        last_bin = last_bin * pipeline.sample_rate / 1024 #last bin frequency
-        strongest_bin = np.argmax(magnitude[1:513]) + 1
-        strongest_mag = magnitude[strongest_bin]
-        frequency = strongest_bin * pipeline.sample_rate / 1024
+        # start = int(30 * pipeline.sample_rate)
+        # window = signal[start:start + 1024]
+        # result = np.fft.rfft(window * np.hanning(1024))
+        # magnitude = np.abs(result) #Takes portions starting at 30 secs, uses fft to discover strongest frequency
+        # bin_1_frequency = 1* pipeline.sample_rate / 1024 # 1st bin freqncy
+        # last_bin = len(magnitude) - 1 
+        # last_bin = last_bin * pipeline.sample_rate / 1024 #last bin frequency
+        # strongest_bin = np.argmax(magnitude[1:513]) + 1
+        # strongest_mag = magnitude[strongest_bin]
+        # frequency = strongest_bin * pipeline.sample_rate / 1024
 
-        print(f"Bin count: {len(magnitude)}")#513
-        print(f"1st bin Frequncy is {bin_1_frequency}hz")#21.5332 hz
-        print(f"last bin frequency is {last_bin:.6f}hz") ##11025hz
-        print(f"strongest bin {strongest_bin}")
-        print(f"strongest_frequency {frequency:.6f}hz")
-        print(f"strongest magnitude {strongest_mag:.6f}")
+        # print(f"Bin count: {len(magnitude)}")#513
+        # print(f"1st bin Frequncy is {bin_1_frequency}hz")#21.5332 hz
+        # print(f"last bin frequency is {last_bin:.6f}hz") ##11025hz
+        # print(f"strongest bin {strongest_bin}")
+        # print(f"strongest_frequency {frequency:.6f}hz")
+        # print(f"strongest magnitude {strongest_mag:.6f}")
 
-        pipeline.position = 0
-        for i in range(50):
-            features = pipeline.get_features()
+        # pipeline.position = 0
+        # for i in range(50):
+        #     features = pipeline.get_features()
 
-            if (i + 1) % 10 == 0:
-                print(i + 1, features)
+        #     if (i + 1) % 10 == 0:
+        #         print(i + 1, features)
 
-        #workshop 3, prt3
-        pipeline.position = 0
-        pipeline.previous_magnitude = np.zeros(pipeline.window_size // 2 + 1)
-        onsets = []
-        num_windows = len(signal) // pipeline.window_size
+        # #workshop 3, prt3
+        # pipeline.position = 0
+        # pipeline.previous_magnitude = np.zeros(pipeline.window_size // 2 + 1)
+        # onsets = []
+        # num_windows = len(signal) // pipeline.window_size
 
-        for i in range(num_windows):
-            position = pipeline.position
-            features = pipeline.get_features()
-            time = position / pipeline.sample_rate
-            onsets.append((features["onset"], time))
+        # for i in range(num_windows):
+        #     position = pipeline.position
+        #     features = pipeline.get_features()
+        #     time = position / pipeline.sample_rate
+        #     onsets.append((features["onset"], time))
 
-        onsets.sort(reverse=True)
+        # onsets.sort(reverse=True)
 
-        selected = []
-        for strong, time in onsets:
-            if all(abs(time - existing_time) >= 0.5
-                   for _, existing_time in selected):
-                selected.append((strong, time))
+        # selected = []
+        # for strong, time in onsets:
+        #     if all(abs(time - existing_time) >= 0.5
+        #            for _, existing_time in selected):
+        #         selected.append((strong, time))
 
-            if len(selected) == 5:
-                break
+        #     if len(selected) == 5:
+        #         break
 
-        for strength, time in selected:
-            print(f"Onset is {strength:.6f}, Time is {time:.6f} (seconds)")
+        # for strength, time in selected:
+        #     print(f"Onset is {strength:.6f}, Time is {time:.6f} (seconds)")
 
-        detected_onsets = librosa.onset.onset_detect(y=signal, sr=pipeline.sample_rate, units="time")
-        print("librosa onset time is", detected_onsets)
+        # detected_onsets = librosa.onset.onset_detect(y=signal, sr=pipeline.sample_rate, units="time")
+        # print("librosa onset time is", detected_onsets)
 
         #task 15 (workshop 3, part 3)
 
@@ -204,7 +204,9 @@ def run_full_app():
         #Feature_source()? then get it to return audio_player.time?
         #Keep the except for now(?)
         pipeline.position = 0
-        feature_source = tolerate_not_implemented(pipeline.get_features)
+        feature_source = tolerate_not_implemented(
+            lambda: pipeline.get_features(engine.audio_player.time)
+        ) #Lambda used to delay call until feature_source called.
     except NotImplementedError:
         print(NOT_IMPLEMENTED_MESSAGE)
         feature_source = lambda: {}

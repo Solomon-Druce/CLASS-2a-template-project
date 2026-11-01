@@ -76,7 +76,7 @@ class BaseEngine(ABC):
                 elapsed_fps = time.perf_counter() - fps_timer
 
                 if elapsed_fps >= 1.0:
-                    print(f"Average FPS: {frame_count / elapsed_fps:.2f}")
+                    # print(f"Average FPS: {frame_count / elapsed_fps:.2f}") #Code to test it prints FPS.
 
                     fps = frame_count / elapsed_fps
                     frame_count = 0

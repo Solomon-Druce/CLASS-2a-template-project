@@ -28,18 +28,26 @@ class AudioPipeline:
         """
         #raise NotImplementedError
 
-    def get_features(self, chunk_size: int = 1024) -> dict: #Chunk+size = samples to be read.
+    def get_features(self, playback_time: float, chunk_size: int = 1024) -> dict: #Chunk+size = samples to be read.
         #Ideas:
         #Add playback_time: float to get_features to keep track of that?
         #make self position based on playback time multiplied by sample_rate?
         #Keep the loop directly below "amplitude" (Make it look nicer tho)
         
         #Amplitude
-        if self.position + chunk_size > len(self.signal): #Where the next section starts. Len(self.,sginal) is total samples
+        self.position = int(playback_time * self.sample_rate)
+        if self.position + chunk_size > len(self.signal):
             self.position = 0
-        chunk = self.signal[self.position:self.position + chunk_size] #Takes the audio window in a slice. Ends before chunk_size added to selfposition
-        amplitude = float(np.sqrt(np.mean(chunk ** 2))) #Calcs Root mean square (rms)
-        self.position += chunk_size #Advances to the next set.
+
+        chunk = self.signal[self.position:self.position + chunk_size]
+        amplitude = float(np.sqrt(np.mean(chunk ** 2)))
+
+
+        # if self.position + chunk_size > len(self.signal): #Where the next section starts. Len(self.,sginal) is total samples
+        #     self.position = 0
+        # chunk = self.signal[self.position:self.position + chunk_size] #Takes the audio window in a slice. Ends before chunk_size added to selfposition
+        # amplitude = float(np.sqrt(np.mean(chunk ** 2))) #Calcs Root mean square (rms)
+        # self.position += chunk_size #Advances to the next set.
         #Workshop 3, task1+2
         window = np.hanning(chunk_size)
         spectrum = np.fft.rfft(chunk * window)
@@ -52,7 +60,6 @@ class AudioPipeline:
         frequencies = np.fft.rfftfreq(chunk_size, d=1 / self.sample_rate)
         centroid = np.sum(frequencies * magnitude) / np.sum(magnitude)
         #Task 3, part 3
-        self.previous_magnitude = np.zeros(self.window_size // 2 + 1)
         onset = np.sum(np.maximum(0, magnitude - self.previous_magnitude))
         self.previous_magnitude = magnitude.copy()
 

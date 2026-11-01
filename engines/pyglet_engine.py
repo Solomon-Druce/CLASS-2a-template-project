@@ -34,6 +34,8 @@ class PygletEngine(BaseEngine):
         self.audio_player = pyglet.media.Player()
         self.audio_player.volume = 0.1 #Volume control.
         self.audio_player.queue(self.audio_source)
+        self.audio_player.loop = True
+        self.audio_player.seek(250)
         self.audio_player.play()
         #FPS label
         self.fps_label = pyglet.text.Label("FPS is: 0.0", 
@@ -54,6 +56,8 @@ class PygletEngine(BaseEngine):
                 return pyglet.event.EVENT_HANDLED
 
     def handle_events(self) -> bool:
+        pyglet.clock.tick()
+        pyglet.app.platform_event_loop.dispatch_posted_events()
         # BaseEngine.run() owns the loop, so events are dispatched manually
         # here each frame rather than handing control to pyglet.app.run().
         self.window.dispatch_events()
