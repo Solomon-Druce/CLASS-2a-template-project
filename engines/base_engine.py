@@ -35,7 +35,7 @@ class BaseEngine(ABC):
         """
 
     @abstractmethod
-    def update(self, audio_features: dict) -> None:
+    def update(self, audio_features: dict, delta_time: float) -> None:
         """Advance state for this frame using the latest audio feature values."""
 
     @abstractmethod
@@ -52,19 +52,35 @@ class BaseEngine(ABC):
         engine tier shares this exact loop.
         """
         frame_duration = 1.0 / self.target_fps
+        previous_frame = time.perf_counter()
         self.setup()
         try:
             running = True
+            fps = 0.0
+            fps_timer = time.perf_counter()
+            frame_count = 0 #For FPS
             while running:
                 frame_start = time.perf_counter()
+                delta_time = frame_start - previous_frame
+                previous_frame = frame_start #Added for Workshop 4
+                delta_time = min(delta_time, 0.05) #Caps it to 50ms
 
                 running = self.handle_events()
                 if not running:
                     break
 
                 audio_features = feature_source()
-                self.update(audio_features)
+                self.update(audio_features, delta_time, fps) #Delta time added for workshop 4
                 self.render()
+                frame_count += 1 #For task.
+                elapsed_fps = time.perf_counter() - fps_timer
+
+                if elapsed_fps >= 1.0:
+                    print(f"Average FPS: {frame_count / elapsed_fps:.2f}")
+
+                    fps = frame_count / elapsed_fps
+                    frame_count = 0
+                    fps_timer = time.perf_counter()
 
                 elapsed = time.perf_counter() - frame_start
                 remaining = frame_duration - elapsed
