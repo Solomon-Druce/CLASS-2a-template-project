@@ -35,7 +35,7 @@ class PygletEngine(BaseEngine):
         self.audio_player.volume = 0.1 #Volume control.
         self.audio_player.queue(self.audio_source)
         self.audio_player.loop = True
-        self.audio_player.seek(250)
+        # self.audio_player.seek(250) #Added to ensure the song loops.
         self.audio_player.play()
         #FPS label
         self.fps_label = pyglet.text.Label("FPS is: 0.0", 
@@ -70,9 +70,13 @@ class PygletEngine(BaseEngine):
     def update(self, audio_features: dict, delta_time: float, fps) -> None:
         self.amplitude_label.text = f"Amplitude is  {audio_features["amplitude"]:.6f}"#Takes info from audio_features(specifically amplitude to 6 figures) and displays it.
         self.fps_label.text = f"FPS is {fps:.1f}"
+        #Amplitude changing colour of bar.
+        amplitude = audio_features["amplitude"]
+        red = int(255 * amplitude)
         for i in range(len(self.bars)):
-            self.bars[i].height = audio_features["amplitude"] * 500  # Scale the bar height based on amplitude
-        print(f"delta time is {delta_time} seconds")
+            self.bars[i].height = amplitude * 500  # Scale the bar height based on amplitude
+            self.bars[i].color = (red, 0, 0) #Temp black for start.
+        # print(f"delta time is {delta_time} seconds") #Used to check it was getting an actual output.
          
     def render(self) -> None:
         self.window.clear()
