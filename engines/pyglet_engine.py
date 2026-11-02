@@ -72,10 +72,22 @@ class PygletEngine(BaseEngine):
         self.fps_label.text = f"FPS is {fps:.1f}"
         #Amplitude changing colour of bar.
         amplitude = audio_features["amplitude"]
+        bass = audio_features["Bass"]
+        treble = audio_features["treble energy"]
+        centroid = audio_features["centroid"]
+        onset = audio_features["onset"]
         red = int(255 * amplitude)
+        blue = int(255 * bass)
         for i in range(len(self.bars)):
-            self.bars[i].height = amplitude * 500  # Scale the bar height based on amplitude
-            self.bars[i].color = (red, 0, 0) #Temp black for start.
+            self.bars[0].height = amplitude * 500  # Scale the bar height based on amplitude
+            self.bars[1].height = bass * 0.25
+            self.bars[2].height = treble * 0.25
+            self.bars[3].height = centroid 
+            self.bars[4].height = onset
+            #Determines colors for the bars (Decide later)
+            self.bars[0].color = (red, 0, 0) #Temp black for start.
+            self.bars[1].color = (0, 0, blue)
+            
         # print(f"delta time is {delta_time} seconds") #Used to check it was getting an actual output.
          
     def render(self) -> None:
