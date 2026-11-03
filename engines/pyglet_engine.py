@@ -68,6 +68,7 @@ class PygletEngine(BaseEngine):
     #gets info from get_features(playback time) to keep them in sync?
 
     def update(self, audio_features: dict, delta_time: float, fps) -> None:
+        #Labels
         self.amplitude_label.text = f"Amplitude is  {audio_features["amplitude"]:.6f}"#Takes info from audio_features(specifically amplitude to 6 figures) and displays it.
         self.fps_label.text = f"FPS is {fps:.1f}"
         #Amplitude changing colour of bar.
@@ -76,17 +77,23 @@ class PygletEngine(BaseEngine):
         treble = audio_features["treble energy"]
         centroid = audio_features["centroid"]
         onset = audio_features["onset"]
+        #Normalisation for energy stuff
+        # bass_normal = min(bass / bass_max, 1.0)
         red = int(255 * amplitude)
         blue = int(255 * bass)
         for i in range(len(self.bars)):
-            self.bars[0].height = amplitude * 500  # Scale the bar height based on amplitude
-            self.bars[1].height = bass * 0.25
-            self.bars[2].height = treble * 0.25
-            self.bars[3].height = centroid 
-            self.bars[4].height = onset
+            self.bars[0].height = min(amplitude * 500, 400)  # Scale the bar height based on amplitude
+            self.bars[1].height = min(bass * 0.25, 400)
+            self.bars[2].height = min(treble * 0.25, 400)
+            self.bars[3].height = min(centroid, 400) 
+            self.bars[4].height = min(onset, 400)
             #Determines colors for the bars (Decide later)
-            self.bars[0].color = (red, 0, 0) #Temp black for start.
-            self.bars[1].color = (0, 0, blue)
+            self.bars[0].color = (red, 75, 125)
+            self.bars[1].color = (red, 75, 125)
+            self.bars[2].color = (red, 75, 125)
+            self.bars[3].color = (red, 75, 125)
+            self.bars[4].color = (red, 75, 125) #Temp black for start.
+            # self.bars[1].color = (0, 0, blue)
             
         # print(f"delta time is {delta_time} seconds") #Used to check it was getting an actual output.
          
