@@ -17,6 +17,14 @@ class AudioPipeline:
         self.position = 0
         self.window_size = 1024
         self.previous_magnitude = np.zeros(self.window_size // 2 + 1) #Array of 513 zeros
+        #Setting for normalisation
+        self.amp_high = 0
+        self.mid_high = 0
+        self.bass_high = 0
+        self.treble_high = 0
+        self.centroid_high = 0
+        self.onset_high = 0
+
 
     def load(self, path: str, sr: int = 22050) -> None:
         signal, _ = librosa.load(path, sr=sr)
@@ -42,12 +50,8 @@ class AudioPipeline:
         chunk = self.signal[self.position:self.position + chunk_size]
         amplitude = float(np.sqrt(np.mean(chunk ** 2)))
 
+        #Noramlisation
 
-        # if self.position + chunk_size > len(self.signal): #Where the next section starts. Len(self.,sginal) is total samples
-        #     self.position = 0
-        # chunk = self.signal[self.position:self.position + chunk_size] #Takes the audio window in a slice. Ends before chunk_size added to selfposition
-        # amplitude = float(np.sqrt(np.mean(chunk ** 2))) #Calcs Root mean square (rms)
-        # self.position += chunk_size #Advances to the next set.
         #Workshop 3, task1+2
         window = np.hanning(chunk_size)
         spectrum = np.fft.rfft(chunk * window)
@@ -63,14 +67,33 @@ class AudioPipeline:
         onset = np.sum(np.maximum(0, magnitude - self.previous_magnitude))
         self.previous_magnitude = magnitude.copy()
 
+        #Calculate the high
+        self.amp_high = max(self.amp_high, amplitude)
+        self.bass_high = max(self.bass_high, bass_energy)
+        self.mid_high = max(self.mid_high, mid_energy)
+        self.treble_high = max(self.treble_high, treble_energy)
+        self.centroid_high = max(self.centroid_high, centroid)
+        self.onset_high = max(self.onset_high, onset)
+
+        print(self.amp_high, self.bass_high, self.mid_high, self.treble_high,self.centroid_high, self.onset_high)
         #print(self.position, len(self.signal)) #Temp for task
         return {"amplitude": amplitude,
                 "Bass": float(bass_energy),
                 "mid energy": float(mid_energy),
                 "treble energy": float(treble_energy),
                 "centroid": float(centroid),
-                "onset": float(onset)
+                "onset": float(onset),
+
+                #Returns maximums for later.
+                "amplitude_high": self.amp_high,
+                "bass_high": self.bass_high,
+                "mid_high": self.mid_high,
+                "treble_high": self.treble_high,
+                "centroid_high": self.centroid_high,
+                "onset_high": self.onset_high
                 }
+
+        
 
         #chunk = self.signal[self.position:self.position + self.window_size]
         #amplitude = float(np.sqrt(np.mean(chunk ** 2))) #Amplitude version

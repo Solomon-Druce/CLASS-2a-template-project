@@ -77,22 +77,46 @@ class PygletEngine(BaseEngine):
         treble = audio_features["treble energy"]
         centroid = audio_features["centroid"]
         onset = audio_features["onset"]
+        amplitude_high = audio_features["amplitude_high"]
+        bass_high = audio_features["bass_high"]
+        mid_high = audio_features["mid_high"]
+        treble_high = audio_features["treble_high"]
+        centroid_high = audio_features["centroid_high"]
+        onset_high = audio_features["onset_high"]
         #Normalisation for energy stuff
+        amp_normal = amplitude / amplitude_high if amplitude_high > 0 else 0
+        bass_normal = bass / bass_high if bass_high > 0 else 0
+        treble_normal = treble / treble_high if treble_high > 0 else 0
+        centroid_normal = centroid / centroid_high if centroid_high > 0 else 0
+        onset_normal = onset / onset_high if onset_high > 0 else 0
+
         # bass_normal = min(bass / bass_max, 1.0)
         red = int(255 * amplitude)
         blue = int(255 * bass)
         for i in range(len(self.bars)):
-            self.bars[0].height = min(amplitude * 500, 400)  # Scale the bar height based on amplitude
-            self.bars[1].height = min(bass * 0.25, 400)
-            self.bars[2].height = min(treble * 0.25, 400)
-            self.bars[3].height = min(centroid, 400) 
-            self.bars[4].height = min(onset, 400)
+            # self.bars[0].height = min(amplitude * 500, 400)  # Scale the bar height based on amplitude
+            # self.bars[1].height = min(bass * 0.25, 400)
+            # self.bars[2].height = min(treble * 0.25, 400)
+            # self.bars[3].height = min(centroid, 400) 
+            # self.bars[4].height = min(onset, 400)
+            #Note: Second iteration is better as it relies less upon setting a minimum for each of them.
+            self.bars[0].height = amp_normal * 400  # Scale the bar height based on amplitude
+            self.bars[1].height = bass_normal * 400
+            self.bars[2].height = treble_normal * 400
+            self.bars[3].height = centroid_normal * 400 
+            self.bars[4].height = onset_normal * 400
+            #Colour determination v2
+            amp_green = int(255 * amp_normal)
+            bass_green = int(255 * bass_normal)
+            treble_green = int(255 * treble_normal)
+            centroid_green = int(255 * centroid_normal)
+            onset_green = int(255 * onset_normal)
             #Determines colors for the bars (Decide later)
-            self.bars[0].color = (red, 75, 125)
-            self.bars[1].color = (red, 75, 125)
-            self.bars[2].color = (red, 75, 125)
-            self.bars[3].color = (red, 75, 125)
-            self.bars[4].color = (red, 75, 125) #Temp black for start.
+            self.bars[0].color = (125, amp_green, 125)
+            self.bars[1].color = (125, bass_green, 125)
+            self.bars[2].color = (125, treble_green, 125)
+            self.bars[3].color = (125, centroid_green, 125)
+            self.bars[4].color = (125, onset_green, 125)
             # self.bars[1].color = (0, 0, blue)
             
         # print(f"delta time is {delta_time} seconds") #Used to check it was getting an actual output.

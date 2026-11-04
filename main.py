@@ -198,14 +198,8 @@ def run_full_app():
         total_energy = low_energy + mid_energy + high_energy
 
         print(f"Total energy is {total_energy:.12e}")
-        #Print the difference
 
-
-        amp_high = 0
-        for amplitude in signal:
-            if amplitude > amp_high:
-                amp_high = amplitude
-        print(amp_high)    
+        #Print the difference 
         #Change this to a function?
         #Feature_source()? then get it to return audio_player.time?
         #Keep the except for now(?)
