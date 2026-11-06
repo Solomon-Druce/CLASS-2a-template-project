@@ -75,7 +75,7 @@ class AudioPipeline:
         self.centroid_high = max(self.centroid_high, centroid)
         self.onset_high = max(self.onset_high, onset)
 
-        print(self.amp_high, self.bass_high, self.mid_high, self.treble_high,self.centroid_high, self.onset_high)
+        #print(self.amp_high, self.bass_high, self.mid_high, self.treble_high,self.centroid_high, self.onset_high)
         #print(self.position, len(self.signal)) #Temp for task
         return {"amplitude": amplitude,
                 "Bass": float(bass_energy),

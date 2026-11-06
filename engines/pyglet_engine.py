@@ -14,21 +14,15 @@ class PygletEngine(BaseEngine):
         self.window = pyglet.window.Window(self.width, self.height, caption=self.title)
         self._should_close = False
         glClearColor(*_BG)
-        #Amplitude Label
-        self.amplitude_label = pyglet.text.Label("Amplitude is: 0.0", 
-        font_size=18, x=150, y=300, 
-        anchor_x="center", anchor_y="center"
-        ) #Places the text at x=400, y=300 and displays 0.0 if nothing is working currently
-        #Border(?)
         self.batch = pyglet.graphics.Batch()
         self.border_line = shapes.Line (x = 0, x2 = 1920, y= 325, y2=325, thickness = 10, color = (50, 225, 30), batch = self.batch)
         #Bars (WIP) Intent is to have user select how many bars they want (How?)
         self.bars = []
-        x = 200
+        x = 300
         for i in range(5):
-            bar = shapes.Rectangle (x, y = 400, width = 100, height = 200, color = (0, 255, 0), batch = self.batch)
+            bar = shapes.Rectangle (x, y = 400, width = 200, height = 200, color = (0, 255, 0), batch = self.batch)
             self.bars.append(bar)
-            x = x + 120
+            x = x + 250
         #Audio playing (forgot earlier)
         self.audio_source = pyglet.media.load("audio/CGA.mp3", streaming = False)
         self.audio_player = pyglet.media.Player()
@@ -39,10 +33,39 @@ class PygletEngine(BaseEngine):
         self.audio_player.play()
         #FPS label
         self.fps_label = pyglet.text.Label("FPS is: 0.0", 
-        font_size=18, x=150, y=250, 
-        anchor_x="center", anchor_y="center"
-        )
-
+        font_size=18, x=1850, y=1050, 
+        anchor_x="center", anchor_y="center")
+        #Mass Labels for each one to get a better visual.
+        self.amplitude_label = pyglet.text.Label("Amplitude is: 0.0", 
+        font_size=18, x=400, y=300, 
+        anchor_x="center", anchor_y="center")
+        self.bass_label = pyglet.text.Label("??? is: 0.0",
+        font_size = 18, x = 650, y = 300,
+        anchor_x = "center", anchor_y = "center")
+        self.trebel_label = pyglet.text.Label("??? is: 0.0",
+        font_size = 18, x = 900, y = 300,
+        anchor_x = "center", anchor_y = "center")
+        self.centroid_label = pyglet.text.Label("??? is: 0.0",
+        font_size = 18, x = 1150, y = 300,
+        anchor_x = "center", anchor_y = "center")
+        self.onset_label = pyglet.text.Label("??? is: 0.0",
+        font_size = 18, x = 1400, y = 300,
+        anchor_x = "center", anchor_y = "center")
+        self.high_amp_label = pyglet.text.Label("??? is: 0.0", 
+        font_size=18, x=250, y=250, 
+        anchor_x="center", anchor_y="center")
+        self.high_bass_label = pyglet.text.Label("??? is: 0.0", 
+        font_size=18, x=250, y=200, 
+        anchor_x="center", anchor_y="center")
+        self.high_treble_label = pyglet.text.Label("??? is: 0.0", 
+        font_size=18, x=250, y=150, 
+        anchor_x="center", anchor_y="center")
+        self.high_centroid_label = pyglet.text.Label("??? is: 0.0", 
+        font_size=18, x=250, y=100, 
+        anchor_x="center", anchor_y="center")
+        self.high_onset_label = pyglet.text.Label("??? is: 0.0", 
+        font_size=18, x=250, y=50, 
+        anchor_x="center", anchor_y="center")
 
         @self.window.event
         def on_close():
@@ -68,9 +91,18 @@ class PygletEngine(BaseEngine):
     #gets info from get_features(playback time) to keep them in sync?
 
     def update(self, audio_features: dict, delta_time: float, fps) -> None:
-        #Labels
+        #Labels part 2
         self.amplitude_label.text = f"Amplitude is  {audio_features["amplitude"]:.6f}"#Takes info from audio_features(specifically amplitude to 6 figures) and displays it.
         self.fps_label.text = f"FPS is {fps:.1f}"
+        self.bass_label.text = f"Bass is {audio_features["Bass"]:.6f}"
+        self.trebel_label.text = f"Treble is {audio_features["treble energy"]:.6f}"
+        self.centroid_label.text = f"Centroid is {audio_features["centroid"]:.6f}"
+        self.onset_label.text = f"Onset is {audio_features["onset"]:.6f}"
+        self.high_amp_label.text = f"Highest recorded amplitude is {audio_features["amplitude_high"]:.6f}"
+        self.high_bass_label.text = f"Highest recorded Bass is {audio_features["bass_high"]:.6f}"
+        self.high_treble_label.text = f"Highest recorded Treble is {audio_features["treble_high"]:.6f}"
+        self.high_centroid_label.text = f"Highest recorded Centroid is {audio_features["centroid_high"]:.6f}"
+        self.high_onset_label.text = f"Highest recorded Onset is {audio_features["onset_high"]:.6f}"
         #Amplitude changing colour of bar.
         amplitude = audio_features["amplitude"]
         bass = audio_features["Bass"]
@@ -112,11 +144,11 @@ class PygletEngine(BaseEngine):
             centroid_green = int(255 * centroid_normal)
             onset_green = int(255 * onset_normal)
             #Determines colors for the bars (Decide later)
-            self.bars[0].color = (125, amp_green, 125)
-            self.bars[1].color = (125, bass_green, 125)
-            self.bars[2].color = (125, treble_green, 125)
-            self.bars[3].color = (125, centroid_green, 125)
-            self.bars[4].color = (125, onset_green, 125)
+            self.bars[0].color = (50, amp_green, 50)
+            self.bars[1].color = (50, bass_green, 50)
+            self.bars[2].color = (50, treble_green, 50)
+            self.bars[3].color = (50, centroid_green, 50)
+            self.bars[4].color = (50, onset_green, 50)
             # self.bars[1].color = (0, 0, blue)
             
         # print(f"delta time is {delta_time} seconds") #Used to check it was getting an actual output.
@@ -126,6 +158,15 @@ class PygletEngine(BaseEngine):
         # time.sleep(0.03) #Added due to
         self.amplitude_label.draw()
         self.fps_label.draw()
+        self.bass_label.draw()
+        self.trebel_label.draw()
+        self.centroid_label.draw()
+        self.onset_label.draw()
+        self.high_amp_label.draw()
+        self.high_bass_label.draw()
+        self.high_centroid_label.draw()
+        self.high_onset_label.draw()
+        self.high_treble_label.draw()
         self.batch.draw()
         self.window.flip()
 
