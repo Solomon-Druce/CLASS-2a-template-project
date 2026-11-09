@@ -91,19 +91,6 @@ class PygletEngine(BaseEngine):
     #gets info from get_features(playback time) to keep them in sync?
 
     def update(self, audio_features: dict, delta_time: float, fps) -> None:
-        #Labels part 2
-        self.amplitude_label.text = f"Amplitude is  {audio_features["amplitude"]:.6f}"#Takes info from audio_features(specifically amplitude to 6 figures) and displays it.
-        self.fps_label.text = f"FPS is {fps:.1f}"
-        self.bass_label.text = f"Bass is {audio_features["Bass"]:.6f}"
-        self.trebel_label.text = f"Treble is {audio_features["treble energy"]:.6f}"
-        self.centroid_label.text = f"Centroid is {audio_features["centroid"]:.6f}"
-        self.onset_label.text = f"Onset is {audio_features["onset"]:.6f}"
-        self.high_amp_label.text = f"Highest recorded amplitude is {audio_features["amplitude_high"]:.6f}"
-        self.high_bass_label.text = f"Highest recorded Bass is {audio_features["bass_high"]:.6f}"
-        self.high_treble_label.text = f"Highest recorded Treble is {audio_features["treble_high"]:.6f}"
-        self.high_centroid_label.text = f"Highest recorded Centroid is {audio_features["centroid_high"]:.6f}"
-        self.high_onset_label.text = f"Highest recorded Onset is {audio_features["onset_high"]:.6f}"
-        #Amplitude changing colour of bar.
         amplitude = audio_features["amplitude"]
         bass = audio_features["Bass"]
         treble = audio_features["treble energy"]
@@ -116,40 +103,52 @@ class PygletEngine(BaseEngine):
         centroid_high = audio_features["centroid_high"]
         onset_high = audio_features["onset_high"]
         #Normalisation for energy stuff
-        amp_normal = amplitude / amplitude_high if amplitude_high > 0 else 0
-        bass_normal = bass / bass_high if bass_high > 0 else 0
-        treble_normal = treble / treble_high if treble_high > 0 else 0
-        centroid_normal = centroid / centroid_high if centroid_high > 0 else 0
-        onset_normal = onset / onset_high if onset_high > 0 else 0
+        amp_normal = min(amplitude / amplitude_high, 1.0) if amplitude_high > 0 else 0
+        bass_normal = min(bass / bass_high, 1.0) if bass_high > 0 else 0
+        treble_normal = min(treble / treble_high, 1.0) if treble_high > 0 else 0
+        centroid_normal = min(centroid / centroid_high, 1.0) if centroid_high > 0 else 0
+        onset_normal = min(onset / onset_high, 1.0) if onset_high > 0 else 0
+        #Labels part 2
+        self.amplitude_label.text = f"Amplitude is {amp_normal:.6f}"#Takes info from audio_features(specifically amplitude to 6 figures) and displays it.
+        self.fps_label.text = f"FPS is {fps:.1f}"
+        self.bass_label.text = f"Bass is {bass_normal:.6f}"
+        self.trebel_label.text = f"Treble is {treble_normal:.6f}"
+        self.centroid_label.text = f"Centroid is {centroid_normal:.6f}"
+        self.onset_label.text = f"Onset is {onset_normal:.6f}"
+        self.high_amp_label.text = f"Highest recorded amplitude is {audio_features["amplitude_high"]:.6f}"
+        self.high_bass_label.text = f"Highest recorded Bass is {audio_features["bass_high"]:.6f}"
+        self.high_treble_label.text = f"Highest recorded Treble is {audio_features["treble_high"]:.6f}"
+        self.high_centroid_label.text = f"Highest recorded Centroid is {audio_features["centroid_high"]:.6f}"
+        self.high_onset_label.text = f"Highest recorded Onset is {audio_features["onset_high"]:.6f}"
+        #Amplitude changing colour of bar.
 
         # bass_normal = min(bass / bass_max, 1.0)
-        red = int(255 * amplitude)
-        blue = int(255 * bass)
-        for i in range(len(self.bars)):
+
+
             # self.bars[0].height = min(amplitude * 500, 400)  # Scale the bar height based on amplitude
             # self.bars[1].height = min(bass * 0.25, 400)
             # self.bars[2].height = min(treble * 0.25, 400)
             # self.bars[3].height = min(centroid, 400) 
             # self.bars[4].height = min(onset, 400)
             #Note: Second iteration is better as it relies less upon setting a minimum for each of them.
-            self.bars[0].height = amp_normal * 400  # Scale the bar height based on amplitude
-            self.bars[1].height = bass_normal * 400
-            self.bars[2].height = treble_normal * 400
-            self.bars[3].height = centroid_normal * 400 
-            self.bars[4].height = onset_normal * 400
+        self.bars[0].height = amp_normal * 400  # Scale the bar height based on amplitude
+        self.bars[1].height = bass_normal * 400
+        self.bars[2].height = treble_normal * 400
+        self.bars[3].height = centroid_normal * 400 
+        self.bars[4].height = onset_normal * 400
             #Colour determination v2
-            amp_green = int(255 * amp_normal)
-            bass_green = int(255 * bass_normal)
-            treble_green = int(255 * treble_normal)
-            centroid_green = int(255 * centroid_normal)
-            onset_green = int(255 * onset_normal)
-            #Determines colors for the bars (Decide later)
-            self.bars[0].color = (50, amp_green, 50)
-            self.bars[1].color = (50, bass_green, 50)
-            self.bars[2].color = (50, treble_green, 50)
-            self.bars[3].color = (50, centroid_green, 50)
-            self.bars[4].color = (50, onset_green, 50)
-            # self.bars[1].color = (0, 0, blue)
+        amp_green = int(255 * amp_normal)
+        bass_green = int(255 * bass_normal)
+        treble_green = int(255 * treble_normal)
+        centroid_green = int(255 * centroid_normal)
+        onset_green = int(255 * onset_normal)
+        #Determines colors for the bars (Decide later)
+        self.bars[0].color = (50, amp_green, 50)
+        self.bars[1].color = (50, bass_green, 50)
+        self.bars[2].color = (50, treble_green, 50)
+        self.bars[3].color = (50, centroid_green, 50)
+        self.bars[4].color = (50, onset_green, 50)
+        # self.bars[1].color = (0, 0, blue)
             
         # print(f"delta time is {delta_time} seconds") #Used to check it was getting an actual output.
          
