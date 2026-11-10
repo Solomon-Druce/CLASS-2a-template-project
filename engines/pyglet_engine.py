@@ -16,13 +16,16 @@ class PygletEngine(BaseEngine):
         glClearColor(*_BG)
         self.batch = pyglet.graphics.Batch()
         self.border_line = shapes.Line (x = 0, x2 = 1920, y= 325, y2=325, thickness = 10, color = (50, 225, 30), batch = self.batch)
-        #Bars (WIP) Intent is to have user select how many bars they want (How?)
+        #Bars creation into a List.
         self.bars = []
         x = 300
         for i in range(5):
-            bar = shapes.Rectangle (x, y = 400, width = 200, height = 200, color = (0, 255, 0), batch = self.batch)
+            bar = shapes.Rectangle (x, y = 400, 
+            width = 200, height = 200, 
+            color = (0, 255, 0), 
+            batch = self.batch)
             self.bars.append(bar)
-            x = x + 250
+            x = x + 250 #Sets them a distance apart for each iteration of it until all 5 are created.
         #Audio playing (forgot earlier)
         self.audio_source = pyglet.media.load("audio/CGA.mp3", streaming = False)
         self.audio_player = pyglet.media.Player()
@@ -98,7 +101,6 @@ class PygletEngine(BaseEngine):
         onset = audio_features["onset"]
         amplitude_high = audio_features["amplitude_high"]
         bass_high = audio_features["bass_high"]
-        mid_high = audio_features["mid_high"]
         treble_high = audio_features["treble_high"]
         centroid_high = audio_features["centroid_high"]
         onset_high = audio_features["onset_high"]
@@ -109,40 +111,30 @@ class PygletEngine(BaseEngine):
         centroid_normal = min(centroid / centroid_high, 1.0) if centroid_high > 0 else 0
         onset_normal = min(onset / onset_high, 1.0) if onset_high > 0 else 0
         #Labels part 2
-        self.amplitude_label.text = f"Amplitude is {amp_normal:.6f}"#Takes info from audio_features(specifically amplitude to 6 figures) and displays it.
+        self.amplitude_label.text = f"Amplitude is {amp_normal:.2f}"#Takes info from audio_features(specifically amplitude to 6 figures) and displays it.
         self.fps_label.text = f"FPS is {fps:.1f}"
-        self.bass_label.text = f"Bass is {bass_normal:.6f}"
-        self.trebel_label.text = f"Treble is {treble_normal:.6f}"
-        self.centroid_label.text = f"Centroid is {centroid_normal:.6f}"
-        self.onset_label.text = f"Onset is {onset_normal:.6f}"
+        self.bass_label.text = f"Bass is {bass_normal:.2f}"
+        self.trebel_label.text = f"Treble is {treble_normal:.2f}"
+        self.centroid_label.text = f"Centroid is {centroid_normal:.2f}"
+        self.onset_label.text = f"Onset is {onset_normal:.2f}"
         self.high_amp_label.text = f"Highest recorded amplitude is {audio_features["amplitude_high"]:.6f}"
         self.high_bass_label.text = f"Highest recorded Bass is {audio_features["bass_high"]:.6f}"
         self.high_treble_label.text = f"Highest recorded Treble is {audio_features["treble_high"]:.6f}"
         self.high_centroid_label.text = f"Highest recorded Centroid is {audio_features["centroid_high"]:.6f}"
         self.high_onset_label.text = f"Highest recorded Onset is {audio_features["onset_high"]:.6f}"
         #Amplitude changing colour of bar.
-
-        # bass_normal = min(bass / bass_max, 1.0)
-
-
-            # self.bars[0].height = min(amplitude * 500, 400)  # Scale the bar height based on amplitude
-            # self.bars[1].height = min(bass * 0.25, 400)
-            # self.bars[2].height = min(treble * 0.25, 400)
-            # self.bars[3].height = min(centroid, 400) 
-            # self.bars[4].height = min(onset, 400)
-            #Note: Second iteration is better as it relies less upon setting a minimum for each of them.
         self.bars[0].height = amp_normal * 400  # Scale the bar height based on amplitude
         self.bars[1].height = bass_normal * 400
         self.bars[2].height = treble_normal * 400
         self.bars[3].height = centroid_normal * 400 
         self.bars[4].height = onset_normal * 400
-            #Colour determination v2
+        #Colour determination v2
         amp_green = int(255 * amp_normal)
         bass_green = int(255 * bass_normal)
         treble_green = int(255 * treble_normal)
         centroid_green = int(255 * centroid_normal)
         onset_green = int(255 * onset_normal)
-        #Determines colors for the bars (Decide later)
+        #Determines colors for the bars based upon energy
         self.bars[0].color = (50, amp_green, 50)
         self.bars[1].color = (50, bass_green, 50)
         self.bars[2].color = (50, treble_green, 50)
@@ -154,7 +146,7 @@ class PygletEngine(BaseEngine):
          
     def render(self) -> None:
         self.window.clear()
-        # time.sleep(0.03) #Added due to
+        # time.sleep(0.03) #Added due to task. Will be removed later.
         self.amplitude_label.draw()
         self.fps_label.draw()
         self.bass_label.draw()

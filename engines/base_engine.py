@@ -80,7 +80,7 @@ class BaseEngine(ABC):
 
                     fps = frame_count / elapsed_fps
                     frame_count = 0
-                    fps_timer = time.perf_counter()
+                    fps_timer = time.perf_counter() #Keeps FPS counter.
 
                 elapsed = time.perf_counter() - frame_start
                 remaining = frame_duration - elapsed
