@@ -4,6 +4,7 @@ from pyglet.window import key
 from pyglet import shapes
 import time
 from engines.base_engine import BACKGROUND_COLOR, BaseEngine
+from pyglet.window import key, mouse
 
 _BG = tuple(c / 255 for c in BACKGROUND_COLOR) + (1.0,)
 
@@ -69,6 +70,19 @@ class PygletEngine(BaseEngine):
         self.high_onset_label = pyglet.text.Label("??? is: 0.0", 
         font_size=18, x=250, y=50, 
         anchor_x="center", anchor_y="center")
+        #User Interaction speed-slider.
+        self.playback_speed = 1.0 #Keeps it at a regular speed upon first launch.
+        self.slider_track = shapes.Rectangle(
+            x=700, y =1050, 
+            width=500, height=8, 
+            color = (100, 100, 100), 
+            batch=self.batch) #Creates the line for the circle to change playback speed.
+        self.slider_handle = shapes.Circle(
+            x=950, y=1050, 
+            radius=12, 
+            color=(0,255, 0), 
+            batch=self.batch) #Creates the circle for the slider.
+        self.dragging_slide = False
 
         @self.window.event
         def on_close():
@@ -80,6 +94,25 @@ class PygletEngine(BaseEngine):
             if symbol == key.ESCAPE:
                 self._should_close = True
                 return pyglet.event.EVENT_HANDLED
+
+        @self.window.event
+        def on_mouse_press(x, y, button, modifiers):
+            if button == mouse.LEFT:
+                if abs(x - self.slider_handle.x) <= 12 and abs(y - self.slider_handle.y) <= 12:
+                    self.dragging_slide = True
+
+        @self.window.event
+        def on_mouse_drag(x, y, x2, y2, buttons, modifiers):
+            if self.dragging_slide:
+                self.slider_handle.x = max(700, min(x, 1200))
+                self.playback_speed = 0.5 + ((self.slider_handle.x - 700) / 500) * 1.5
+                self.audio_player.pitch = self.playback_speed
+                print(self.playback_speed)
+
+        @self.window.event
+        def on_mouse_release(x, y, button, modifiers):
+            if button == mouse.LEFT:
+                self.dragging_slider = False
 
     def handle_events(self) -> bool:
         pyglet.clock.tick()
